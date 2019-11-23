@@ -1,0 +1,5 @@
+FROM  nginx:1.17.2-alpine
+ENV TZ Asia/Shanghai
+EXPOSE 80
+STOPSIGNAL SIGTERM
+CMD ["nginx", "-g", "daemon off;"]

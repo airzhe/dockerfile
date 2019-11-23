@@ -1,0 +1,19 @@
+FROM ubuntu:18.04
+WORKDIR /root
+ENV SALT_SIZE=10 DK_SIZE=50
+RUN apt-get -y update \
+    && apt-get -y install git gcc libltdl-dev make groff groff-base libssl-dev \
+    && git clone https://github.com/openldap/openldap.git \
+    && cd openldap \
+    && ./configure --enable-modules \
+    && make \
+    && make install \
+    && cd ./contrib/slapd-modules/passwd/pbkdf2 \
+    && sed -i "s/PBKDF2_SALT_SIZE 16/PBKDF2_SALT_SIZE ${SALT_SIZE}/g" pw-pbkdf2.c \
+    && sed -i "s/PBKDF2_SHA256_DK_SIZE 32/PBKDF2_SHA256_DK_SIZE ${DK_SIZE}/g" pw-pbkdf2.c \
+    && sed '19 a#define HAVE_OPENSSL' -i pw-pbkdf2.c \
+    && make \
+    && mv slapo-pw-pbkdf2.5 slapd-pw-pbkdf2.5 \                                
+    && make install \
+    && sed '19 a# moduleload\tpw-pbkdf2.la' -i /usr/local/etc/openldap/slapd.conf
+CMD ["sh", "-c", "/usr/local/libexec/slapd -f /usr/local/etc/openldap/slapd.conf; tail -f /dev/null;"]
