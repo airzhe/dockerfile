@@ -9,6 +9,5 @@ RUN cd /tmp \
     && npm config set registry https://registry.npm.taobao.org && npm install \
     && npm run build:h5-netlify 
 
-FROM nginx:latest
-COPY --from=builder /tmp/md/dist/index.html /usr/share/nginx/html
-COPY --from=builder /tmp/md/dist/static /usr/share/nginx/html/static
+FROM nginx:alpine
+COPY --from=builder /tmp/md/dist /usr/share/nginx/html
