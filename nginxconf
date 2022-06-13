@@ -1,0 +1,7 @@
+from node:lts-alpine
+run apk add git
+run git clone https://github.com/digitalocean/nginxconfig.io.git
+run cd ./nginxconfig.io && npm ci --legacy-peer-deps
+expose 8080
+workdir /nginxconfig.io
+cmd npm run dev
